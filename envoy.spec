@@ -1,3 +1,4 @@
+## waiting on 1.4.0 to be released, so using the HEAD commit from 2017-08-02
 %global git_commit ee138524fc55b4b9a9918d11976aa2b5d59cc694
 
 %global debug_package %{nil}
