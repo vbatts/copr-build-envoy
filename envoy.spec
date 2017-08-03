@@ -6,6 +6,10 @@
 %global __strip /bin/true
 %global debug_package %{nil}
 
+# don't byte compile the ./examples ...
+%global __spec_install_post /usr/lib/rpm/check-rpaths   /usr/lib/rpm/check-buildroot  \
+	/usr/lib/rpm/brp-compress
+
 Name:		envoy
 Version:	1.3.0.git.%{git_shortcommit}
 Release:	1%{?dist}
@@ -71,11 +75,11 @@ echo -n "%{version}" > SOURCE_VERSION
 
 # build twice, cause the first one often fails in a clean build cache
 %if 0%{?rhel} > 6
-scl enable devtoolset-4 -- bazel build //source/... ||:
-scl enable devtoolset-4 -- bazel build //source/...
+scl enable devtoolset-4 -- bazel build //source/exe:envoy-static ||:
+scl enable devtoolset-4 -- bazel build //source/exe:envoy-static
 %else
-bazel build //source/... ||:
-bazel build //source/...
+bazel build //source/exe:envoy-static ||:
+bazel build //source/exe:envoy-static
 %endif
 
 %install
@@ -96,7 +100,7 @@ for file in $(find docs examples -type f) ; do
 done
 
 %files
-%copying LICENSE
+%license LICENSE
 %{_bindir}/envoy
 
 %files docs -f docs.file-list
