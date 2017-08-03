@@ -17,6 +17,8 @@ URL:		https://github.com/lyft/envoy
 #Source0:	https://github.com/lyft/%{name}/archive/v%{version}.tar.gz
 Source0:	https://github.com/lyft/envoy/archive/%{git_commit}.zip
 
+Patch0:		distro-version.diff
+
 # see https://copr.fedorainfracloud.org/coprs/vbatts/bazel/
 BuildRequires:	bazel
 
@@ -59,11 +61,13 @@ Requires:	%{name} = %{version}-%{release}
 %{summary}
 
 %prep
-%setup -q -c -n %{name}-%{git_commit}
+%setup -q -n %{name}-%{git_commit}
+%patch0 -p 1
 
 %build
 
-pushd %{name}-%{git_commit}
+# remove once https://github.com/lyft/envoy/pull/1385 is merged
+echo -n "%{version}" > SOURCE_VERSION
 
 # build twice, cause the first one often fails in a clean build cache
 %if 0%{?rhel} > 6
@@ -77,7 +81,7 @@ bazel build //source/...
 %install
 cp /dev/null docs.file-list
 filelist=$(realpath docs.file-list)
-pushd %{name}-%{git_commit}
+
 rm -rf $RPM_BUILD_ROOT
 
 mkdir -p $RPM_BUILD_ROOT/%{_bindir}
