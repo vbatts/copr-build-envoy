@@ -1,0 +1,45 @@
+commit 34ebef695f37f480140b7239df4e5c2e00d3e00d
+Author: Vincent Batts <vbatts@hashbangbash.com>
+Date:   Fri Aug 4 09:39:33 2017 -0400
+
+    build_recipe: carry lightstep patch
+    
+    this is really only for building a distribution package with newer
+    gcc-c++, like 7.1.1.
+    
+    Signed-off-by: Vincent Batts <vbatts@hashbangbash.com>
+
+diff --git a/ci/build_container/build_recipes/lightstep-missing-header.diff b/ci/build_container/build_recipes/lightstep-missing-header.diff
+new file mode 100644
+index 0000000..af2c051
+--- /dev/null
++++ b/ci/build_container/build_recipes/lightstep-missing-header.diff
+@@ -0,0 +1,10 @@
++--- ./src/c++11/lightstep/options.h.bak	2017-08-04 09:30:19.527076744 -0400
+++++ ./src/c++11/lightstep/options.h	2017-08-04 09:30:33.742106924 -0400
++@@ -5,6 +5,7 @@
++ // Options for Tracer implementations, starting Spans, and finishing
++ // Spans.
++ 
+++#include <functional>
++ #include <chrono>
++ #include <memory>
++ 
+diff --git a/ci/build_container/build_recipes/lightstep.sh b/ci/build_container/build_recipes/lightstep.sh
+index 5ace138..6d842f2 100755
+--- a/ci/build_container/build_recipes/lightstep.sh
++++ b/ci/build_container/build_recipes/lightstep.sh
+@@ -4,9 +4,13 @@ set -e
+ 
+ VERSION=0.36
+ 
++recipe_root="$(dirname $0)"
++
+ wget -O lightstep-tracer-cpp-$VERSION.tar.gz https://github.com/lightstep/lightstep-tracer-cpp/releases/download/v${VERSION//./_}/lightstep-tracer-cpp-$VERSION.tar.gz
+ tar xf lightstep-tracer-cpp-$VERSION.tar.gz
+ cd lightstep-tracer-cpp-$VERSION
++# see https://github.com/lyft/envoy/issues/1387 for progress
++patch < "${recipe_root}/lightstep-missing-header.diff"
+ # Added for legacy compatibility, should not be needed in new build recipes.
+ [ -z "$PROTOBUF_BUILD" ] && PROTOBUF_BUILD="$THIRDPARTY_BUILD"
+ ./configure --disable-grpc --prefix=$THIRDPARTY_BUILD --enable-shared=no \
