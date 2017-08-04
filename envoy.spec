@@ -23,6 +23,8 @@ URL:		https://github.com/lyft/envoy
 Source0:	https://github.com/lyft/envoy/archive/%{git_commit}.zip
 
 Patch0:		lightstep-patch-build.diff
+Patch1:		fall-through.diff
+Patch2:		envoy-missing-headers.diff
 
 # see https://copr.fedorainfracloud.org/coprs/vbatts/bazel/
 BuildRequires:	bazel
@@ -69,11 +71,16 @@ Requires:	%{name} = %{version}-%{release}
 %prep
 %setup -q -n %{name}-%{git_commit}
 %patch0 -p 1
+%patch1 -p 1
+%patch2 -p 1
 
 %build
 
 # remove once https://github.com/lyft/envoy/pull/1385 is merged
 echo -n "%{version}" > SOURCE_VERSION
+
+## upstream's recommendation for a release build
+#bazel --bazelrc=/dev/null build -c opt //source/exe:envoy-static.stripped.stamped
 
 # build twice, cause the first one often fails in a clean build cache
 %if 0%{?rhel} > 6
