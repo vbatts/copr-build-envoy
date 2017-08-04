@@ -1,5 +1,5 @@
 ## waiting on 1.4.0 to be released, so using the HEAD commit from 2017-08-02
-%global git_commit ee138524fc55b4b9a9918d11976aa2b5d59cc694
+%global git_commit 2fa90d22521376a7990196e34a1e1bb945663ab4
 %global git_shortcommit     %(c=%{git_commit}; echo ${c:0:7})
 
 # don't strip binaries at all
@@ -11,7 +11,7 @@
 	/usr/lib/rpm/brp-compress
 
 Name:		envoy
-Version:	1.3.0.git.%{git_shortcommit}
+Version:	1.3.0.1.git.%{git_shortcommit}
 Release:	1%{?dist}
 Summary:	Envoy is an open source edge and service proxy
 
@@ -20,8 +20,6 @@ License:	Apache v2
 URL:		https://github.com/lyft/envoy
 #Source0:	https://github.com/lyft/%{name}/archive/v%{version}.tar.gz
 Source0:	https://github.com/lyft/envoy/archive/%{git_commit}.zip
-
-Patch0:		distro-version.diff
 
 # see https://copr.fedorainfracloud.org/coprs/vbatts/bazel/
 BuildRequires:	bazel
@@ -66,7 +64,6 @@ Requires:	%{name} = %{version}-%{release}
 
 %prep
 %setup -q -n %{name}-%{git_commit}
-%patch0 -p 1
 
 %build
 
@@ -109,5 +106,9 @@ done
 
 
 %changelog
+* Thu Aug 03 2017 Vincent Batts <vbatts@fedoraproject.org> 1.3.0.1.git.2fa90d2-1
+- update from upstream
+- add another digit to the version to handle version bumps due to git commits.
+
 * Wed Aug 02 2017 Vincent Batts <vbatts@fedoraproject.org> 1.3.0.git.ee13852-1
 - update from upstream
