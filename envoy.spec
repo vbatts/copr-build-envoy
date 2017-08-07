@@ -1,15 +1,15 @@
-%global git_commit 4837f3230f371b205c1cbf99b6ad2045372493d1
-%global git_shortcommit     %(c=%{git_commit}; echo ${c:0:7})
+%global git_commit		4837f3230f371b205c1cbf99b6ad2045372493d1
+%global git_shortcommit		%(c=%{git_commit}; echo ${c:0:7})
 # this is just a monotonically increasing number to preceed the git hash, to get incremented on every git bump
-%global git_bump 2
+%global git_bump		3
 
 # don't strip binaries at all
-%global __strip /bin/true
-%global debug_package %{nil}
+%global __strip			/bin/true
+%global debug_package		%{nil}
 
 # don't byte compile the ./examples ...
-%global __spec_install_post /usr/lib/rpm/check-rpaths   /usr/lib/rpm/check-buildroot  \
-	/usr/lib/rpm/brp-compress
+%global __spec_install_post	/usr/lib/rpm/check-rpaths   /usr/lib/rpm/check-buildroot  \
+				/usr/lib/rpm/brp-compress
 
 Name:		envoy
 Version:	1.3.0.%{git_bump}.git.%{git_shortcommit}
@@ -23,8 +23,6 @@ URL:		https://github.com/lyft/envoy
 Source0:	https://github.com/lyft/envoy/archive/%{git_commit}.zip
 
 Patch0:		lightstep-patch-build.diff
-Patch1:		fall-through.diff
-Patch2:		envoy-missing-headers.diff
 
 # see https://copr.fedorainfracloud.org/coprs/vbatts/bazel/
 BuildRequires:	bazel
@@ -71,8 +69,6 @@ Requires:	%{name} = %{version}-%{release}
 %prep
 %setup -q -n %{name}-%{git_commit}
 %patch0 -p 1
-%patch1 -p 1
-%patch2 -p 1
 
 %build
 
@@ -118,6 +114,9 @@ done
 
 
 %changelog
+* Mon Aug 07 2017 Vincent Batts <vbatts@fedoraproject.org> 1.3.0.3.git.4837f32-1
+- update from upstream
+
 * Fri Aug 04 2017 Vincent Batts <vbatts@fedoraproject.org> 1.3.0.2.git.4837f32-1
 - update from upstream
 - add another digit to the version to handle version bumps due to git commits.
