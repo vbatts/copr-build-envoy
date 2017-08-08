@@ -1,7 +1,7 @@
-%global git_commit		701f0366c08e9519014f1142e63a5eaae8d2bbd2
+%global git_commit		8c42f16163c7b36df75f503d669d7171d0961571
 %global git_shortcommit		%(c=%{git_commit}; echo ${c:0:7})
 # this is just a monotonically increasing number to preceed the git hash, to get incremented on every git bump
-%global git_bump		4
+%global git_bump		5
 
 # don't strip binaries at all
 %global __strip			/bin/true
