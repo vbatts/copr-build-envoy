@@ -1,7 +1,7 @@
-%global git_commit		8c42f16163c7b36df75f503d669d7171d0961571
+%global git_commit		dde7be743057126c23226c87ccdeb48e90b0b01a
 %global git_shortcommit		%(c=%{git_commit}; echo ${c:0:7})
 # this is just a monotonically increasing number to preceed the git hash, to get incremented on every git bump
-%global git_bump		5
+%global git_bump		6
 
 # don't strip binaries at all
 %global __strip			/bin/true
@@ -21,8 +21,6 @@ License:	Apache v2
 URL:		https://github.com/lyft/envoy
 #Source0:	https://github.com/lyft/%{name}/archive/v%{version}.tar.gz
 Source0:	https://github.com/lyft/envoy/archive/%{git_commit}.zip
-
-Patch0:		lightstep-patch-build.diff
 
 # see https://copr.fedorainfracloud.org/coprs/vbatts/bazel/
 BuildRequires:	bazel
@@ -44,7 +42,6 @@ BuildRequires:	golang
 BuildRequires:  clang
 BuildRequires:	cmake
 BuildRequires:	coreutils
-BuildRequires:	patch
 
 %if 0%{?rhel} > 6
 BuildRequires:	centos-release-scl
@@ -68,7 +65,6 @@ Requires:	%{name} = %{version}-%{release}
 
 %prep
 %setup -q -n %{name}-%{git_commit}
-%patch0 -p 1
 
 %build
 
