@@ -1,7 +1,7 @@
 %global git_commit		d61812aab5037d97c85042c389937d2ee29f5910
 %global git_shortcommit		%(c=%{git_commit}; echo ${c:0:7})
 # this is just a monotonically increasing number to preceed the git hash, to get incremented on every git bump
-%global git_bump		7
+%global git_bump		8
 
 # don't strip binaries at all
 %global __strip			/bin/true
@@ -77,11 +77,11 @@ echo -n "%{git_commit}" > SOURCE_VERSION
 
 # build twice, cause the first one often fails in a clean build cache
 %if 0%{?rhel} > 6
-scl enable devtoolset-4 -- bazel build //source/exe:envoy-static ||:
-scl enable devtoolset-4 -- bazel build //source/exe:envoy-static
+scl enable devtoolset-4 -- bazel build --verbose_failures //source/exe:envoy-static ||:
+scl enable devtoolset-4 -- bazel build --verbose_failures //source/exe:envoy-static
 %else
-bazel build //source/exe:envoy-static ||:
-bazel build //source/exe:envoy-static
+bazel build --verbose_failures //source/exe:envoy-static ||:
+bazel build --verbose_failures //source/exe:envoy-static
 %endif
 
 %install
