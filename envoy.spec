@@ -1,7 +1,7 @@
-%global git_commit		dde7be743057126c23226c87ccdeb48e90b0b01a
+%global git_commit		d61812aab5037d97c85042c389937d2ee29f5910
 %global git_shortcommit		%(c=%{git_commit}; echo ${c:0:7})
 # this is just a monotonically increasing number to preceed the git hash, to get incremented on every git bump
-%global git_bump		6
+%global git_bump		7
 
 # don't strip binaries at all
 %global __strip			/bin/true
@@ -68,8 +68,9 @@ Requires:	%{name} = %{version}-%{release}
 
 %build
 
-# remove once https://github.com/lyft/envoy/pull/1385 is merged
-echo -n "%{version}" > SOURCE_VERSION
+# Needs to be a git sha1
+# https://github.com/lyft/envoy/blob/master/source/server/server.cc#L58
+echo -n "%{git_commit}" > SOURCE_VERSION
 
 ## upstream's recommendation for a release build
 #bazel --bazelrc=/dev/null build -c opt //source/exe:envoy-static.stripped.stamped
