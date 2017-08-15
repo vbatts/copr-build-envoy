@@ -77,11 +77,13 @@ echo -n "%{git_commit}" > SOURCE_VERSION
 
 # build twice, cause the first one often fails in a clean build cache
 %if 0%{?rhel} > 6
-scl enable devtoolset-4 -- bazel build --verbose_failures //source/exe:envoy-static ||:
-scl enable devtoolset-4 -- bazel build --verbose_failures //source/exe:envoy-static
+#scl enable devtoolset-4 -- bazel build --verbose_failures //source/exe:envoy-static
+scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped ||:
+scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped
 %else
-bazel build --verbose_failures //source/exe:envoy-static ||:
-bazel build --verbose_failures //source/exe:envoy-static
+#bazel build --verbose_failures //source/exe:envoy-static
+bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped ||:
+bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped
 %endif
 
 %install
