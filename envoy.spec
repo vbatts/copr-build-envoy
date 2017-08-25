@@ -1,7 +1,7 @@
-%global git_commit		b137f0f1a387c68a4cd1785d442081645a740369
-%global git_shortcommit		%(c=%{git_commit}; echo ${c:0:7})
 # this is just a monotonically increasing number to preceed the git hash, to get incremented on every git bump
-%global git_bump		9
+%global git_bump		0
+%global git_commit		a8507f67225cdd912712971bf72d41f219eb74ed
+%global git_shortcommit		%(c=%{git_commit}; echo ${c:0:7})
 
 # don't strip binaries at all
 %global __strip			/bin/true
@@ -11,8 +11,11 @@
 %global __spec_install_post	/usr/lib/rpm/check-rpaths   /usr/lib/rpm/check-buildroot  \
 				/usr/lib/rpm/brp-compress
 
+# they warn against doing this ... :-\
+%define _disable_source_fetch 0
+
 Name:		envoy
-Version:	1.3.0.%{git_bump}.git.%{git_shortcommit}
+Version:	1.4.0.%{git_bump}.git.%{git_shortcommit}
 Release:	1%{?dist}
 Summary:	Envoy is an open source edge and service proxy
 
