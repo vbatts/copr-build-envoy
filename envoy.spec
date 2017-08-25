@@ -67,6 +67,7 @@ Requires:	%{name} = %{version}-%{release}
 %{summary}
 
 %prep
+sha1sum %{SOURCE0}
 %setup -q -n %{name}-%{git_commit}
 
 %build
