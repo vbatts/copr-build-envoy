@@ -16,7 +16,7 @@
 
 Name:		envoy
 Version:	1.4.0.%{git_bump}.git.%{git_shortcommit}
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Envoy is an open source edge and service proxy
 
 #Group:		
@@ -84,10 +84,12 @@ echo -n "%{git_commit}" > SOURCE_VERSION
 #scl enable devtoolset-4 -- bazel build --verbose_failures //source/exe:envoy-static
 scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped ||:
 scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped
+scl enable devtoolset-4 -- bazel shutdown
 %else
 #bazel build --verbose_failures //source/exe:envoy-static
 bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped ||:
 bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped
+bazel shutdown
 %endif
 
 %install
