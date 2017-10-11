@@ -1,6 +1,6 @@
 # this is just a monotonically increasing number to preceed the git hash, to get incremented on every git bump
-%global git_bump		2
-%global git_commit		2ddcec61d7e3ed545dc5f2b0652c360bcd16e958
+%global git_bump		3
+%global git_commit		c473b56a87560bb08916a2d6835e82710356d193
 %global git_shortcommit		%(c=%{git_commit}; echo ${c:0:7})
 
 # don't strip binaries at all
@@ -21,9 +21,9 @@ Summary:	Envoy is an open source edge and service proxy
 
 #Group:		
 License:	Apache v2
-URL:		https://github.com/lyft/envoy
-#Source0:	https://github.com/lyft/%{name}/archive/v%{version}.tar.gz
-Source0:	https://github.com/lyft/envoy/archive/%{git_commit}.zip
+URL:		https://github.com/envoyproxy/envoy
+#Source0:	https://github.com/envoyproxy/%{name}/archive/v%{version}.tar.gz
+Source0:	https://github.com/envoyproxy/envoy/archive/%{git_commit}.zip
 
 # see https://copr.fedorainfracloud.org/coprs/vbatts/bazel/
 BuildRequires:	bazel
@@ -73,7 +73,7 @@ sha1sum %{SOURCE0}
 %build
 
 # Needs to be a git sha1
-# https://github.com/lyft/envoy/blob/master/source/server/server.cc#L58
+# https://github.com/envoyproxy/envoy/blob/master/source/server/server.cc#L58
 echo -n "%{git_commit}" > SOURCE_VERSION
 
 ## upstream's recommendation for a release build
