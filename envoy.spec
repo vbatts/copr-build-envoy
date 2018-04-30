@@ -1,6 +1,6 @@
 # this is just a monotonically increasing number to preceed the git hash, to get incremented on every git bump
-%global git_bump		2
-%global git_commit		8f30f67262d6db0762e3014e57e3bdfab96c0dfc
+%global git_bump		0
+%global git_commit		13de384ab34428af99c53201f6b3c95991b7ae10
 %global git_shortcommit		%(c=%{git_commit}; echo ${c:0:7})
 
 # don't strip binaries at all
@@ -15,7 +15,7 @@
 %define _disable_source_fetch 0
 
 Name:		envoy
-Version:	1.5.0.%{git_bump}.git.%{git_shortcommit}
+Version:	1.6.0.%{git_bump}.git.%{git_shortcommit}
 Release:	1%{?dist}
 Summary:	Envoy is an open source edge and service proxy
 
@@ -77,18 +77,18 @@ sha1sum %{SOURCE0}
 echo -n "%{git_commit}" > SOURCE_VERSION
 
 ## upstream's recommendation for a release build
-#bazel --bazelrc=/dev/null build -c opt //source/exe:envoy-static.stripped.stamped
+#bazel --bazelrc=/dev/null build -c opt //source/exe:envoy-static
 
 # build twice, cause the first one often fails in a clean build cache
 %if 0%{?rhel} > 6
 #scl enable devtoolset-4 -- bazel build --verbose_failures //source/exe:envoy-static
-scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped ||:
-scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped
+scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static ||:
+scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static
 scl enable devtoolset-4 -- bazel shutdown
 %else
 #bazel build --verbose_failures //source/exe:envoy-static
-bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped ||:
-bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped
+bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static ||:
+bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static
 bazel shutdown
 %endif
 
