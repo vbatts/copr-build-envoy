@@ -1,5 +1,5 @@
 # this is just a monotonically increasing number to preceed the git hash, to get incremented on every git bump
-%global git_bump		0
+%global git_bump		1
 %global git_commit		13de384ab34428af99c53201f6b3c95991b7ae10
 %global git_shortcommit		%(c=%{git_commit}; echo ${c:0:7})
 
@@ -43,7 +43,7 @@ BuildRequires:	python-virtualenv
 BuildRequires:	which
 BuildRequires:	golang
 BuildRequires:  clang
-BuildRequires:	cmake
+BuildRequires:	cmake >= 3.1
 BuildRequires:	coreutils
 
 %if 0%{?rhel} > 6
@@ -81,12 +81,11 @@ echo -n "%{git_commit}" > SOURCE_VERSION
 
 # build twice, cause the first one often fails in a clean build cache
 %if 0%{?rhel} > 6
-#scl enable devtoolset-4 -- bazel build --verbose_failures //source/exe:envoy-static
-scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static ||:
-scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static
-scl enable devtoolset-4 -- bazel shutdown
+. scl_source enable devtoolset-4
+bazel --bazelrc=/dev/null build --verbose_failures --copt "-DENVOY_IGNORE_GLIBCXX_USE_CXX11_ABI_ERROR=1" -c opt //source/exe:envoy-static ||:
+bazel --bazelrc=/dev/null build --verbose_failures --copt "-DENVOY_IGNORE_GLIBCXX_USE_CXX11_ABI_ERROR=1" -c opt //source/exe:envoy-static
+bazel shutdown
 %else
-#bazel build --verbose_failures //source/exe:envoy-static
 bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static ||:
 bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static
 bazel shutdown
