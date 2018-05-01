@@ -1,6 +1,6 @@
 # this is just a monotonically increasing number to preceed the git hash, to get incremented on every git bump
-%global git_bump		2
-%global git_commit		13de384ab34428af99c53201f6b3c95991b7ae10
+%global git_bump		3
+%global git_commit		84a1dd9e000e2e167e3fb53c9ee8eac7024d3fa6
 %global git_shortcommit		%(c=%{git_commit}; echo ${c:0:7})
 
 # don't strip binaries at all
@@ -24,8 +24,7 @@ License:	Apache v2
 URL:		https://github.com/envoyproxy/envoy
 #Source0:	https://github.com/envoyproxy/%{name}/archive/v%{version}.tar.gz
 Source0:	https://github.com/envoyproxy/envoy/archive/%{git_commit}.zip
-Patch0:		a4d281399.diff
-Patch1: 	aedbcb732.diff
+#Patch0:	a4d281399.diff
 
 # see https://copr.fedorainfracloud.org/coprs/vbatts/bazel/
 BuildRequires:	bazel
@@ -47,7 +46,7 @@ BuildRequires:	golang
 BuildRequires:  clang
 BuildRequires:	cmake >= 3.1
 BuildRequires:	coreutils
-BuildRequires:	patch
+#BuildRequires:	patch
 
 %if 0%{?rhel} > 6
 BuildRequires:	centos-release-scl
@@ -73,8 +72,7 @@ Requires:	%{name} = %{version}-%{release}
 sha1sum %{SOURCE0}
 %setup -q -n %{name}-%{git_commit}
 
-%patch0 -p 1
-%patch1 -p 1
+#%patch0 -p 1
 
 %build
 
