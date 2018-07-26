@@ -1,6 +1,6 @@
 # this is just a monotonically increasing number to preceed the git hash, to get incremented on every git bump
-%global git_bump		2
-%global git_commit		8f30f67262d6db0762e3014e57e3bdfab96c0dfc
+%global git_bump		0
+%global git_commit		845923714078e5a3528e85d4b58f2cc95850a1c6
 %global git_shortcommit		%(c=%{git_commit}; echo ${c:0:7})
 
 # don't strip binaries at all
@@ -15,7 +15,7 @@
 %define _disable_source_fetch 0
 
 Name:		envoy
-Version:	1.5.0.%{git_bump}.git.%{git_shortcommit}
+Version:	1.7.0.%{git_bump}.git.%{git_shortcommit}
 Release:	1%{?dist}
 Summary:	Envoy is an open source edge and service proxy
 
@@ -24,6 +24,9 @@ License:	Apache v2
 URL:		https://github.com/envoyproxy/envoy
 #Source0:	https://github.com/envoyproxy/%{name}/archive/v%{version}.tar.gz
 Source0:	https://github.com/envoyproxy/envoy/archive/%{git_commit}.zip
+
+Patch0:		741f16d8e.diff
+Patch1:		centos7-poor-choice.diff
 
 # see https://copr.fedorainfracloud.org/coprs/vbatts/bazel/
 BuildRequires:	bazel
@@ -43,15 +46,17 @@ BuildRequires:	python-virtualenv
 BuildRequires:	which
 BuildRequires:	golang
 BuildRequires:  clang
-BuildRequires:	cmake
 BuildRequires:	coreutils
+BuildRequires:	ninja-build
 
 %if 0%{?rhel} > 6
 BuildRequires:	centos-release-scl
 BuildRequires:	devtoolset-4-gcc-c++
+BuildRequires:	cmake3
 %else
 BuildRequires:	gcc-c++
 BuildRequires:  libstdc++-static
+BuildRequires:	cmake
 %endif
 
 %description
@@ -69,6 +74,11 @@ Requires:	%{name} = %{version}-%{release}
 %prep
 sha1sum %{SOURCE0}
 %setup -q -n %{name}-%{git_commit}
+%patch0 -p1
+
+%if 0%{?rhel} > 6
+%patch1 -p1
+%endif
 
 %build
 
@@ -77,18 +87,26 @@ sha1sum %{SOURCE0}
 echo -n "%{git_commit}" > SOURCE_VERSION
 
 ## upstream's recommendation for a release build
-#bazel --bazelrc=/dev/null build -c opt //source/exe:envoy-static.stripped.stamped
+#bazel --bazelrc=/dev/null build -c opt //source/exe:envoy-static.stripped
 
 # build twice, cause the first one often fails in a clean build cache
 %if 0%{?rhel} > 6
+
+# naming hack ..
+export mypath=$(mktemp -d)
+export PATH=$mypath:$PATH
+ln -sf /usr/bin/ninja-build ${mypath}/ninja # https://bugzilla.redhat.com/show_bug.cgi?id=1608565
+ln -sf /usr/bin/cmake3 ${mypath}/cmake
+
 #scl enable devtoolset-4 -- bazel build --verbose_failures //source/exe:envoy-static
-scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped ||:
-scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped
+scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static ||:
+scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static
 scl enable devtoolset-4 -- bazel shutdown
+
 %else
 #bazel build --verbose_failures //source/exe:envoy-static
-bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped ||:
-bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static.stripped.stamped
+bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static ||:
+bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static
 bazel shutdown
 %endif
 

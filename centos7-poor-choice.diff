@@ -1,0 +1,13 @@
+diff --git a/source/common/common/compiler_requirements.h b/source/common/common/compiler_requirements.h
+index 5048737cd..48c1df32d 100644
+--- a/source/common/common/compiler_requirements.h
++++ b/source/common/common/compiler_requirements.h
+@@ -6,6 +6,8 @@ namespace Envoy {
+ #error "Your compiler does not support C++14. GCC 5+ or Clang is required."
+ #endif
+ 
++#define ENVOY_IGNORE_GLIBCXX_USE_CXX11_ABI_ERROR "poor life choice"
++
+ // See:
+ //   https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html
+ //   https://bugzilla.redhat.com/show_bug.cgi?id=1546704
