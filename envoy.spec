@@ -24,10 +24,8 @@ License:	Apache v2
 URL:		https://github.com/envoyproxy/envoy
 #Source0:	https://github.com/envoyproxy/%{name}/archive/v%{version}.tar.gz
 Source0:	https://github.com/envoyproxy/envoy/archive/%{git_commit}.zip
-#Patch0:	a4d281399.diff
 
 Patch0:		741f16d8e.diff
-Patch1:		centos7-poor-choice.diff
 
 # see https://copr.fedorainfracloud.org/coprs/vbatts/bazel/
 BuildRequires:	bazel
@@ -76,12 +74,6 @@ Requires:	%{name} = %{version}-%{release}
 sha1sum %{SOURCE0}
 %setup -q -n %{name}-%{git_commit}
 %patch0 -p1
-
-%if 0%{?rhel} > 6
-%patch1 -p1
-%endif
-
-#%patch0 -p 1
 
 %build
 
