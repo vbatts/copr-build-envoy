@@ -24,6 +24,7 @@ License:	Apache v2
 URL:		https://github.com/envoyproxy/envoy
 #Source0:	https://github.com/envoyproxy/%{name}/archive/v%{version}.tar.gz
 Source0:	https://github.com/envoyproxy/envoy/archive/%{git_commit}.zip
+#Patch0:	a4d281399.diff
 
 Patch0:		741f16d8e.diff
 Patch1:		centos7-poor-choice.diff
@@ -56,7 +57,7 @@ BuildRequires:	cmake3
 %else
 BuildRequires:	gcc-c++
 BuildRequires:  libstdc++-static
-BuildRequires:	cmake
+BuildRequires:	cmake >= 3.1
 %endif
 
 %description
@@ -80,14 +81,13 @@ sha1sum %{SOURCE0}
 %patch1 -p1
 %endif
 
+#%patch0 -p 1
+
 %build
 
 # Needs to be a git sha1
 # https://github.com/envoyproxy/envoy/blob/master/source/server/server.cc#L58
 echo -n "%{git_commit}" > SOURCE_VERSION
-
-## upstream's recommendation for a release build
-#bazel --bazelrc=/dev/null build -c opt //source/exe:envoy-static.stripped
 
 # build twice, cause the first one often fails in a clean build cache
 %if 0%{?rhel} > 6
@@ -99,12 +99,11 @@ ln -sf /usr/bin/ninja-build ${mypath}/ninja # https://bugzilla.redhat.com/show_b
 ln -sf /usr/bin/cmake3 ${mypath}/cmake
 
 #scl enable devtoolset-4 -- bazel build --verbose_failures //source/exe:envoy-static
-scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static ||:
-scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static
+scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures --copt "-DENVOY_IGNORE_GLIBCXX_USE_CXX11_ABI_ERROR=1" -c opt //source/exe:envoy-static ||:
+scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures --copt "-DENVOY_IGNORE_GLIBCXX_USE_CXX11_ABI_ERROR=1" -c opt //source/exe:envoy-static
 scl enable devtoolset-4 -- bazel shutdown
 
 %else
-#bazel build --verbose_failures //source/exe:envoy-static
 bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static ||:
 bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static
 bazel shutdown
