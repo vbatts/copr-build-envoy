@@ -1,6 +1,6 @@
 # this is just a monotonically increasing number to preceed the git hash, to get incremented on every git bump
 %global git_bump		0
-%global git_commit		f3b0f8580041649bf300a962674a2cf3f3bd1385
+%global git_commit		fd273a65e03cb14cd46891c539b623f4126114f8
 %global git_shortcommit		%(c=%{git_commit}; echo ${c:0:7})
 
 # don't strip binaries at all
@@ -15,7 +15,7 @@
 %define _disable_source_fetch 0
 
 Name:		envoy
-Version:	1.7.1.%{git_bump}.git.%{git_shortcommit}
+Version:	1.10.0.%{git_bump}.git.%{git_shortcommit}
 Release:	1%{?dist}
 Summary:	Envoy is an open source edge and service proxy
 
@@ -128,6 +128,9 @@ done
 
 
 %changelog
+* Tue Apr 02 2019 Giuseppe Ragusa <giuseppe.ragusa@fastmail.fm> 1.10.0.0.git.fd273a6-1
+- update from upstream
+
 * Mon Aug 07 2017 Vincent Batts <vbatts@fedoraproject.org> 1.3.0.3.git.4837f32-1
 - update from upstream
 
