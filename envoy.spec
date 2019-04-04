@@ -25,8 +25,6 @@ URL:		https://github.com/envoyproxy/envoy
 #Source0:	https://github.com/envoyproxy/%{name}/archive/v%{version}.tar.gz
 Source0:	https://github.com/envoyproxy/envoy/archive/%{git_commit}.zip
 
-Patch0:		741f16d8e.diff
-
 # see https://copr.fedorainfracloud.org/coprs/vbatts/bazel/
 BuildRequires:	bazel
 
@@ -72,8 +70,7 @@ Requires:	%{name} = %{version}-%{release}
 
 %prep
 sha1sum %{SOURCE0}
-%setup -q -n %{name}-%{git_commit}
-%patch0 -p1
+%setup -q -n %{name}-master
 
 %build
 
@@ -82,6 +79,7 @@ sha1sum %{SOURCE0}
 echo -n "%{git_commit}" > SOURCE_VERSION
 
 # build twice, cause the first one often fails in a clean build cache
+# ignore shutdown failures (timing out in resource-constrained environments)
 %if 0%{?rhel} > 6
 
 # naming hack ..
@@ -91,13 +89,13 @@ ln -sf /usr/bin/ninja-build ${mypath}/ninja # https://bugzilla.redhat.com/show_b
 ln -sf /usr/bin/cmake3 ${mypath}/cmake
 
 #scl enable devtoolset-4 -- bazel build --verbose_failures //source/exe:envoy-static
-scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures --copt "-DENVOY_IGNORE_GLIBCXX_USE_CXX11_ABI_ERROR=1" -c opt //source/exe:envoy-static ||:
-scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures --copt "-DENVOY_IGNORE_GLIBCXX_USE_CXX11_ABI_ERROR=1" -c opt //source/exe:envoy-static
-scl enable devtoolset-4 -- bazel shutdown
+scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --define exported_symbols=enabled --verbose_failures --copt "-DENVOY_IGNORE_GLIBCXX_USE_CXX11_ABI_ERROR=1" -c opt //source/exe:envoy-static ||:
+scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --define exported_symbols=enabled --verbose_failures --copt "-DENVOY_IGNORE_GLIBCXX_USE_CXX11_ABI_ERROR=1" -c opt //source/exe:envoy-static
+scl enable devtoolset-4 -- bazel shutdown ||:
 
 %else
-bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static ||:
-bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static
+bazel --bazelrc=/dev/null build --define exported_symbols=enabled --verbose_failures -c opt //source/exe:envoy-static ||:
+bazel --bazelrc=/dev/null build --define exported_symbols=enabled --verbose_failures -c opt //source/exe:envoy-static
 bazel shutdown
 %endif
 
@@ -129,7 +127,8 @@ done
 
 %changelog
 * Tue Apr 02 2019 Giuseppe Ragusa <giuseppe.ragusa@fastmail.fm> 1.10.0.0.git.fd273a6-1
-- update from upstream
+- update from upstream (using master)
+- drop patch
 
 * Mon Aug 07 2017 Vincent Batts <vbatts@fedoraproject.org> 1.3.0.3.git.4837f32-1
 - update from upstream
