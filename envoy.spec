@@ -89,13 +89,13 @@ ln -sf /usr/bin/ninja-build ${mypath}/ninja # https://bugzilla.redhat.com/show_b
 ln -sf /usr/bin/cmake3 ${mypath}/cmake
 
 #scl enable devtoolset-4 -- bazel build --verbose_failures //source/exe:envoy-static
-scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --define exported_symbols=enabled --verbose_failures --copt "-DENVOY_IGNORE_GLIBCXX_USE_CXX11_ABI_ERROR=1" -c opt //source/exe:envoy-static ||:
-scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --define exported_symbols=enabled --verbose_failures --copt "-DENVOY_IGNORE_GLIBCXX_USE_CXX11_ABI_ERROR=1" -c opt //source/exe:envoy-static
+scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures --copt "-DENVOY_IGNORE_GLIBCXX_USE_CXX11_ABI_ERROR=1" -c opt //source/exe:envoy-static ||:
+scl enable devtoolset-4 -- bazel --bazelrc=/dev/null build --verbose_failures --copt "-DENVOY_IGNORE_GLIBCXX_USE_CXX11_ABI_ERROR=1" -c opt //source/exe:envoy-static
 scl enable devtoolset-4 -- bazel shutdown ||:
 
 %else
-bazel --bazelrc=/dev/null build --define exported_symbols=enabled --verbose_failures -c opt //source/exe:envoy-static ||:
-bazel --bazelrc=/dev/null build --define exported_symbols=enabled --verbose_failures -c opt //source/exe:envoy-static
+bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static ||:
+bazel --bazelrc=/dev/null build --verbose_failures -c opt //source/exe:envoy-static
 bazel shutdown
 %endif
 
