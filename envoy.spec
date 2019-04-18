@@ -16,7 +16,7 @@
 
 Name:		envoy
 Version:	1.11.0.%{git_bump}.git.%{git_shortcommit}
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Envoy is an open source edge and service proxy
 
 #Group:		
@@ -24,6 +24,11 @@ License:	Apache v2
 URL:		https://github.com/envoyproxy/envoy
 #Source0:	https://github.com/envoyproxy/%{name}/archive/v%{version}.tar.gz
 Source0:	https://github.com/envoyproxy/envoy/archive/%{git_commit}.zip
+Source1:	envoy@.service
+Source2:	envoy.sysconfig
+Source3:	check_envoy.sh
+Source4:	start_envoy.sh
+Source5:	reload_envoy.sh
 
 # see https://copr.fedorainfracloud.org/coprs/vbatts/bazel/
 BuildRequires:	bazel
@@ -50,6 +55,11 @@ BuildRequires:	ninja-build
 BuildRequires:	centos-release-scl
 BuildRequires:	devtoolset-4-gcc-c++
 BuildRequires:	cmake3
+BuildRequires:    systemd-units
+Requires:         firewalld-filesystem
+Requires(post):   systemd-units
+Requires(preun):  systemd-units
+Requires(postun): systemd-units
 %else
 BuildRequires:	gcc-c++
 BuildRequires:  libstdc++-static
@@ -106,7 +116,19 @@ filelist=$(realpath docs.file-list)
 rm -rf $RPM_BUILD_ROOT
 
 mkdir -p $RPM_BUILD_ROOT/%{_bindir}
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/envoy
 cp -pav bazel-bin/source/exe/envoy-static $RPM_BUILD_ROOT/%{_bindir}/envoy
+
+%if 0%{?rhel} > 6
+%{__install} -d -m 0755 %{buildroot}%{_unitdir} \
+                        %{buildroot}%{_sysconfdir}/sysconfig
+%{__install} -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}@.service
+%{__install} -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/sysconfig/%{name}-template
+%{__install} -m 0755 restarter/hot-restarter.py %{buildroot}%{_bindir}
+%{__install} -m 0755 %{SOURCE3} %{buildroot}%{_bindir}
+%{__install} -m 0755 %{SOURCE4} %{buildroot}%{_bindir}
+%{__install} -m 0755 %{SOURCE5} %{buildroot}%{_bindir}
+%endif
 
 # docs stuff
 install -d -p $RPM_BUILD_ROOT/%{_datadir}/%{name}-%{version}
@@ -116,9 +138,34 @@ for file in $(find docs examples -type f) ; do
 	echo "%{_datadir}/%{name}-%{version}/$file" >> $filelist
 done
 
+%post
+%if 0%{?systemd_post:1}
+    %systemd_post %{name}.service
+%endif
+
+%preun
+%if 0%{?systemd_preun:1}
+    %systemd_preun %{name}.service
+%endif
+
+%postun
+%if 0%{?systemd_postun:1}
+    %systemd_postun %{name}.service
+%endif
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
 %files
 %license LICENSE
 %{_bindir}/envoy
+%dir %{_sysconfdir}/envoy
+%if 0%{?rhel} > 6
+%attr(-,root,root) %{_unitdir}/%{name}@.service
+%attr(-,root,root) %{_sysconfdir}/sysconfig/%{name}-template
+%{_bindir}/hot-restarter.py*
+%{_bindir}/*_envoy.sh
+%endif
 
 %files docs -f docs.file-list
 %doc README.md DEVELOPER.md CONTRIBUTING.md CODE_OF_CONDUCT.md
@@ -126,6 +173,9 @@ done
 
 
 %changelog
+* Tue Apr 09 2019 Giuseppe Ragusa <giuseppe.ragusa@fastmail.fm> 1.11.0.0.git.fa69fad-2
+- add systemd unit file, hot restarter and support scripts for CentOS/RHEL > 6
+
 * Tue Apr 09 2019 Giuseppe Ragusa <giuseppe.ragusa@fastmail.fm> 1.11.0.0.git.fa69fad-1
 - update from upstream (using master)
 
