@@ -1,0 +1,13 @@
+# Sample configuration options for Envoy
+
+# Config file pathname
+# Note: this file must exist, be not empty and pass validation
+# Note: pay attention to the filename extension
+CONFIG_FILE="/etc/envoy/example.yaml"
+
+# Base id for multiple instances
+# Note: this number must be unique among all Envoy instances on the same machine
+BASE_ID="6969"
+
+# Further Envoy options directly passed to the executable
+ENVOY_OPTIONS=""

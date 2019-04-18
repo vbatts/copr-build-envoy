@@ -1,0 +1,18 @@
+[Unit]
+Description=Envoy edge and service proxy for %i
+After=network.target
+
+[Service]
+User=root
+Type=simple
+EnvironmentFile=/etc/sysconfig/envoy-%i
+ExecStartPre=/usr/bin/check_envoy.sh
+ExecStart=/usr/bin/hot-restarter.py /usr/bin/start_envoy.sh
+ExecReload=/usr/bin/reload_envoy.sh $MAINPID
+ExecStop=/bin/kill -15 $MAINPID
+TimeoutStopSec=10
+KillMode=process
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
